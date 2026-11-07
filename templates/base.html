@@ -1,0 +1,17 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}Dashboard{% endblock %} · ZAD OSINT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;800&family=Manrope:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></head><body>
+<nav class="nav"><a class="brand" href="/"><i class="fa-solid fa-satellite-dish"></i>ZAD OSINT</a><span class="sp"></span>
+{% if user %}<a class="l" href="{{ url_for('dashboard') }}"><i class="fa-solid fa-gauge"></i> <span>Dashboard</span></a>
+<a class="l" href="{{ url_for('new_bot') }}"><i class="fa-solid fa-circle-plus"></i> <span>New bot</span></a>
+{% if user.role == 'admin' %}<a class="l" href="{{ url_for('admin') }}"><i class="fa-solid fa-user-shield"></i> <span>Admin</span></a>{% endif %}
+<form method="post" action="{{ url_for('logout') }}" style="margin:0"><button class="btn g s"><i class="fa-solid fa-right-from-bracket"></i> Logout</button></form>
+{% else %}<a class="l" href="{{ url_for('login') }}">Login</a><a class="btn s" href="{{ url_for('register') }}">Register</a>{% endif %}</nav>
+<main class="wrap">{% for c, m in get_flashed_messages(with_categories=true) %}<div class="flash {{ c }}">{{ m }}</div>{% endfor %}
+{% for a in announcements %}<div class="ann"><i class="fa-solid fa-bullhorn"></i> {{ a.text }}</div>{% endfor %}
+{% block body %}{% endblock %}</main>
+<footer><b>ZAD OSINT</b> — Premium Bot Hosting<br>Developer: Mafia H4x Coder · SN Hacker · Brother: POKA BROO</footer>
+<script>document.querySelectorAll('form[method=post]').forEach(f=>{const i=document.createElement('input');i.type='hidden';i.name='_csrf';i.value='{{ csrf }}';f.appendChild(i)});</script>
+{% block js %}{% endblock %}</body></html>

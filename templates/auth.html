@@ -1,0 +1,8 @@
+{% extends 'base.html' %}{% block title %}{{ 'Create account' if mode=='register' else 'Login' }}{% endblock %}
+{% block body %}<div class="hero"><h1>Apna bot host karo — 24×7</h1><p>ZIP upload karo, settings bharo, ZAD OSINT bot ko chalu rakhega. 24 ghante free, phir sirf ₹{{ price }} per bot.</p></div>
+<div class="card auth"><h2><i class="fa-solid fa-{{ 'user-plus' if mode=='register' else 'lock' }}"></i> {{ 'Create account' if mode=='register' else 'Login' }}</h2>
+<form method="post">{% if mode=='register' %}<label>Name</label><input name="name" required maxlength="40" autocomplete="name">{% endif %}
+<label>Email</label><input type="email" name="email" required autocomplete="email"><label>Password <small>(min 6)</small></label><input type="password" name="password" required minlength="6" autocomplete="{{ 'new-password' if mode=='register' else 'current-password' }}">
+<p><button class="btn" style="width:100%;justify-content:center">{{ 'Register' if mode=='register' else 'Login' }}</button></p></form>
+<p class="muted">{% if mode=='register' %}Account hai? <a href="{{ url_for('login') }}">Login</a>{% else %}Naya user? <a href="{{ url_for('register') }}">Register</a>{% endif %}</p></div>
+<div class="grid" style="margin-top:1.5rem">{% for i,t in [('wand-magic-sparkles','Auto analyzer: token, chat ID, channel khud detect'),('clock','24h free trial har bot ka'),('infinity','₹'~price~' = permanent hosting per bot'),('gift','Gift code se permanent access')] %}<div class="card stat"><i class="fa-solid fa-{{ i }}"></i><span style="color:var(--ink);font-weight:700">{{ t }}</span></div>{% endfor %}</div>{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}{% block title %}{{ b.name }}{% endblock %}{% block body %}
+<div class="row" style="justify-content:space-between"><h1><i class="fa-solid fa-robot"></i> {{ b.name }} <span id="st">{{ b.state|badge }}</span></h1>
+<div class="row">{% for a,ic,cl in [('start','play','ok'),('restart','rotate','g'),('stop','stop','r')] %}<form method="post" action="{{ url_for('bot_action', bid=b.id, action=a) }}"><button class="btn {{ cl }} s"><i class="fa-solid fa-{{ ic }}"></i> {{ a|title }}</button></form>{% endfor %}
+{% if b.own_zip %}<a class="btn g s" href="{{ url_for('bot_download', bid=b.id) }}"><i class="fa-solid fa-download"></i> Files</a>{% endif %}
+<form method="post" action="{{ url_for('bot_action', bid=b.id, action='delete') }}" onsubmit="return confirm('Bot delete karna hai?')"><button class="btn r s" aria-label="Delete"><i class="fa-solid fa-trash"></i></button></form></div></div>
+<div class="grid"><div class="card stat"><i class="fa-solid fa-shield"></i><div><b>{{ status|badge }}</b><span>Plan status</span></div></div>
+<div class="card stat"><i class="fa-solid fa-hourglass-half"></i><div><b style="font-size:1.1rem">{{ b|left if b.approved else 'Approval pending' }}</b><span>Hosting time</span></div></div>
+<div class="card stat"><i class="fa-solid fa-heart-pulse"></i><div><b id="up" style="font-size:1.1rem">{{ b|uptime }}</b><span>Uptime · <span id="rs">{{ b.restarts }}</span> restarts</span></div></div></div>
+{% if b.last_error %}<div class="flash err">{{ b.last_error }}</div>{% endif %}
+<div class="two"><div class="card"><h2><i class="fa-solid fa-sliders"></i> Configuration</h2>
+{% if b.fields %}<form method="post" action="{{ url_for('bot_config', bid=b.id) }}">{% for f in b.fields %}<label>{{ f.label }} {% if not f.required %}<small>(optional)</small>{% endif %} <small>· {{ f.key }}</small></label>
+<input name="f_{{ f.key }}" type="{{ 'password' if f.type=='secret' else 'url' if f.type=='url' else 'text' }}" {% if f.type=='number' %}inputmode="numeric"{% endif %} {% if f.key in b.config %}placeholder="Saved ✓ (naya daalo to replace hoga)"{% endif %} {% if f.required and f.key not in b.config %}required{% endif %} autocomplete="off">{% endfor %}
+<p><button class="btn"><i class="fa-solid fa-floppy-disk"></i> Save settings</button></p></form>
+{% else %}<p class="muted">Is bot ko koi configuration nahi chahiye.</p>{% endif %}
+{% if b.commands %}<h3>Detected commands</h3>{% for c in b.commands %}<span class="chip">/{{ c }}</span>{% endfor %}{% endif %}
+{% if b.unknown %}<p class="muted"><i class="fa-solid fa-triangle-exclamation"></i> Ye packages auto-install nahi honge (admin review): {{ b.unknown|join(', ') }}</p>{% endif %}</div>
+<div class="card"><h2><i class="fa-solid fa-infinity"></i> Permanent hosting — ₹{{ price }}</h2>
+{% if status=='permanent' %}<p><i class="fa-solid fa-circle-check" style="color:var(--ok)"></i> Is bot ki permanent hosting active hai.</p>
+{% elif not b.approved %}<p class="muted">Custom ZIP admin approval ka wait kar rahi hai.</p>{% else %}
+<p>1. UPI se <b>₹{{ price }}</b> bhejo: <b>{{ upi }}</b><br>2. Neeche naam + 12-digit UTR submit karo.<br>3. Admin 24 ghante mein approve karega.</p>
+<form method="post" action="{{ url_for('bot_pay', bid=b.id) }}"><label>Payer name</label><input name="name" required><label>UTR number</label><input name="utr" required pattern="\d{12}" inputmode="numeric" maxlength="12"><p><button class="btn"><i class="fa-solid fa-paper-plane"></i> Submit payment</button></p></form>
+<form method="post" action="{{ url_for('bot_gift', bid=b.id) }}"><label>Ya Gift code</label><div class="row"><input name="code" placeholder="ZAD-XXXX-XXXX" style="flex:1"><button class="btn g"><i class="fa-solid fa-gift"></i> Apply</button></div></form>{% endif %}
+{% for p in pays %}<p class="muted">{{ p.ts|ts }} · UTR {{ p.utr }} {{ p.status|badge }}</p>{% endfor %}</div></div>
+<div class="card"><h2><i class="fa-solid fa-terminal"></i> Live logs</h2><pre class="log" id="log">{{ b.log_tail or 'Abhi koi log nahi.' }}</pre></div>{% endblock %}
+{% block js %}<script>const L=document.getElementById('log');setInterval(async()=>{try{const r=await fetch('{{ url_for("bot_api", bid=b.id) }}');const j=await r.json();
+document.getElementById('st').innerHTML='<span class="badge '+j.state+'">'+j.state+'</span>';document.getElementById('up').textContent=j.uptime;document.getElementById('rs').textContent=j.restarts;
+const n=L.scrollTop+L.clientHeight>=L.scrollHeight-20;L.textContent=j.log||'Abhi koi log nahi.';if(n)L.scrollTop=L.scrollHeight}catch(e){}},5000);</script>{% endblock %}

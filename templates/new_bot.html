@@ -1,0 +1,11 @@
+{% extends 'base.html' %}{% block title %}New bot{% endblock %}{% block body %}
+<h1><i class="fa-solid fa-circle-plus"></i> Create new bot</h1>
+<form method="post" enctype="multipart/form-data"><div class="card"><label>Bot name</label><input name="name" maxlength="40" placeholder="My Telegram bot"></div>
+<div class="card"><h2><i class="fa-solid fa-store"></i> Ready-made templates</h2><div class="row"><input id="q" placeholder="Search bots…" style="flex:2;min-width:200px"><select id="cat" style="flex:1;min-width:140px"><option value="">All categories</option>{% for c in cats %}<option>{{ c }}</option>{% endfor %}</select></div>
+<div class="grid" style="margin-top:1rem">{% for t in templates %}<label class="card tpl" data-s="{{ (t.title~' '~t.desc)|lower }}" data-c="{{ t.category }}"><input type="radio" name="template_id" value="{{ t.id }}"><b>{{ t.title }}</b> <span class="chip">{{ t.category }}</span><br><span class="muted">{{ t.desc }}</span>
+{% if t.analysis.commands %}<br>{% for c in t.analysis.commands[:6] %}<span class="chip">/{{ c }}</span>{% endfor %}{% endif %}</label>{% else %}<p class="muted">Admin ne abhi koi template upload nahi kiya.</p>{% endfor %}</div>
+<button class="btn" style="margin-top:.5rem"><i class="fa-solid fa-wand-magic-sparkles"></i> Use selected template</button></div>
+<div class="card"><h2><i class="fa-solid fa-file-zipper"></i> Ya apni ZIP upload karo</h2><p class="muted">ZAD code ko analyze karega (run nahi). Custom ZIP ko admin approval chahiye, uske baad 24h trial.</p><input type="file" name="zip" accept=".zip" aria-label="Bot ZIP"><p><button class="btn" name="template_id" value=""><i class="fa-solid fa-upload"></i> Upload &amp; analyze</button></p></div></form>{% endblock %}
+{% block js %}<script>const q=document.getElementById('q'),c=document.getElementById('cat'),T=[...document.querySelectorAll('.tpl')];
+function f(){T.forEach(t=>t.style.display=t.dataset.s.includes(q.value.toLowerCase())&&(!c.value||t.dataset.c===c.value)?'':'none')}q.oninput=c.onchange=f;
+T.forEach(t=>t.querySelector('input').onchange=()=>{T.forEach(x=>x.classList.remove('sel'));t.classList.add('sel')});</script>{% endblock %}

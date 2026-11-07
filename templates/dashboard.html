@@ -1,0 +1,12 @@
+{% extends 'base.html' %}{% block body %}
+<div class="row" style="justify-content:space-between"><h1>Hi, {{ user.name }}</h1><a class="btn" href="{{ url_for('new_bot') }}"><i class="fa-solid fa-plus"></i> Create new bot</a></div>
+<div class="grid">{% for i,k,l in [('robot','total','Total bots'),('play','running','Running'),('stop','stopped','Stopped'),('hourglass-end','expired','Expired'),('infinity','permanent','Permanent')] %}
+<div class="card stat"><i class="fa-solid fa-{{ i }}"></i><div><b>{{ stats[k] }}</b><span>{{ l }}</span></div></div>{% endfor %}</div>
+<div class="card"><h2><i class="fa-solid fa-robot"></i> My bots</h2>{% if bots %}<div class="scroll"><table><tr><th>Bot</th><th>Plan</th><th>Hosting</th><th>State</th><th>Uptime</th><th></th></tr>
+{% for b in bots %}<tr><td><b>{{ b.name }}</b><br><span class="muted">{{ b.source }}</span></td>
+<td>{{ ('suspended' if b.suspended else ('pending' if not b.approved else b.plan))|badge }}</td><td>{{ b|left if b.approved else 'Admin approval pending' }}</td><td>{{ b.state|badge }}</td><td>{{ b|uptime }}</td>
+<td><div class="row"><a class="btn g s" href="{{ url_for('bot_page', bid=b.id) }}">Manage</a>
+{% if b.state=='running' %}<form method="post" action="{{ url_for('bot_action', bid=b.id, action='stop') }}"><button class="btn r s" aria-label="Stop"><i class="fa-solid fa-stop"></i></button></form>
+{% else %}<form method="post" action="{{ url_for('bot_action', bid=b.id, action='start') }}"><button class="btn ok s" aria-label="Start"><i class="fa-solid fa-play"></i></button></form>{% endif %}</div></td></tr>{% endfor %}</table></div>
+{% else %}<p class="muted">Abhi koi bot nahi. <b>Create new bot</b> dabao — template chuno ya apni ZIP upload karo.</p>{% endif %}</div>
+{% if pays %}<div class="card"><h2><i class="fa-solid fa-receipt"></i> Recent payments</h2><div class="scroll"><table><tr><th>Bot</th><th>UTR</th><th>Status</th><th>Date</th></tr>{% for p in pays %}<tr><td>{{ p.bot_name }}</td><td>{{ p.utr }}</td><td>{{ p.status|badge }}</td><td>{{ p.ts|ts }}</td></tr>{% endfor %}</table></div></div>{% endif %}{% endblock %}
