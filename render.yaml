@@ -2,13 +2,9 @@ services:
   - type: web
     name: zad-osint
     runtime: docker
-    plan: starter            # disk + 24x7 bots need a paid plan
+    plan: free
     dockerfilePath: ./Dockerfile
     healthCheckPath: /healthz
-    disk:
-      name: zad-data
-      mountPath: /data
-      sizeGB: 5
     envVars:
       - {key: ADMIN_EMAIL, sync: false}
       - {key: UPI_ID, value: sunny8127@fam}
